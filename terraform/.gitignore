@@ -1,0 +1,16 @@
+# Terraform local state & providers
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# Terraform lock file (optional but recommended to keep)
+# terraform.lock.hcl
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+
