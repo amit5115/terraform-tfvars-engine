@@ -1,0 +1,16 @@
+Show all users
+How many users are there?
+Show latest 2 users
+Show users created in last 10 days
+Show orders with amount greater than 5000
+Show orders created in last 5 days with amount above 4000
+Total order amount per user
+What is the average order amount?
+Highest order amount
+Show user name and total order amount where total is above 5000
+How many VMs are powered on?
+Show all virtual machines
+Show running VMs
+Show powered on VMs
+Show VMs with green heartbeat
+Show VMs that need consolidation

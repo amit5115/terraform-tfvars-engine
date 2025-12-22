@@ -1,9 +1,9 @@
 env = "dev"
 
 server_count = 1
-instance_type = "t3.micro"
+ami_id = "ami-0abcdef1234567890"
 
-allowed_ports = [22]
+instance_type = "t3.micro"
 
 tags = {
   Owner = "amit"
