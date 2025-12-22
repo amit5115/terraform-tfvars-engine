@@ -1,0 +1,13 @@
+# Terraform local files
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
