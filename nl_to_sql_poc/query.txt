@@ -14,3 +14,6 @@ Show running VMs
 Show powered on VMs
 Show VMs with green heartbeat
 Show VMs that need consolidation
+
+python -m uvicorn tools.app:app --reload
+brew services start postgresql

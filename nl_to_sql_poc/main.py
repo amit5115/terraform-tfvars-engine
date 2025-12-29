@@ -1,10 +1,28 @@
 from sqlalchemy import create_engine, text
-from openai import OpenAI
+
+import requests
+import os
+
+# ----------------------------
+# COMPANY GPT CONFIG
+# ----------------------------
+os.environ["NO_PROXY"] = os.environ["no_proxy"] = "ai-framework1"
+
+PROXY_ENDPOINT = "https://ai-framework1:8085"
+API_KEY = ""   # use env var in real life
+NTNET_USER = "amitk30@amdocs.com"
+LLM_MODEL = "gpt-4.1"
+
+HEADERS = {
+    "Content-Type": "application/json",
+    "API-Key": API_KEY,
+    "X-Effective-Caller": NTNET_USER
+}
+
 
 # ----------------------------
 # CONFIG
 # ----------------------------
-client = OpenAI()
 
 engine = create_engine("postgresql+psycopg2://localhost/pocdb")
 
@@ -48,6 +66,26 @@ def run_sql(sql: str):
     with engine.connect() as conn:
         result = conn.execute(text(sql))
         return result.fetchall()
+    
+def call_company_llm(messages):
+    payload = {
+        "llm_model": LLM_MODEL,
+        "messages": messages
+    }
+
+    response = requests.post(
+        f"{PROXY_ENDPOINT}/api/v1/call_llm",
+        headers=HEADERS,
+        json=payload,
+        verify=False
+    )
+
+    if response.status_code != 200:
+        raise Exception(f"LLM Error: {response.status_code} - {response.text}")
+
+    result = response.json()
+    return result["message"]
+
 
 # ----------------------------
 # LLM → SQL
@@ -64,34 +102,29 @@ Database schema:
 Rules:
 - Generate ONLY valid PostgreSQL SQL
 - Use SELECT queries only
-- Use only tables and columns from schema
+- Use ONLY tables and columns from schema
+- ALWAYS double-quote table and column names exactly as shown in schema
 - Return ONLY SQL, no explanation
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": question}
-        ]
-    )
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": question}
+    ]
 
-    return response.choices[0].message.content.strip()
+    sql = call_company_llm(messages)
+    return sql.strip()
+
 
 # ----------------------------
 # MAIN
 # ----------------------------
-question = input("Ask your question: ")
+if __name__ == "__main__":
+    question = input("Ask your question: ")
 
-sql = english_to_sql(question)
-print("\nGenerated SQL:\n", sql)
+    sql = english_to_sql(question)
+    cleaned_sql = clean_sql(sql)
+    rows = run_sql(cleaned_sql)
 
-cleaned_sql = clean_sql(sql)
-print("\nCleaned SQL:\n", cleaned_sql)
-
-rows = run_sql(cleaned_sql)
-
-print("\nResult:")
-for r in rows:
-    print(r)
+    for r in rows:
+        print(r)
